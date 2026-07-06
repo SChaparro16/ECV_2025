@@ -23,7 +23,7 @@ library(ggpubr)
 # CatPCA
 library(Gifi)
 
-#---- Datos ----
+#---- Directorio ----
 
 dirs <- c("/home/fed_scha/Documentos/Rama Antióquia/Datos/",
           "/home/nix_scha/Documentos/Rama Antióquia/Datos/",
@@ -41,6 +41,8 @@ for (i in dirs) {
 }
 
 rm(dir_datos,dir_val,dirs,i)
+
+#---- Datos ----
 
 # Variables
 vars <- read.csv("vars.csv")
@@ -326,39 +328,39 @@ ggplot(data = obb_error_df,mapping = aes(x = IT,y = abs(DIFF))) +
 
 ### Optimo: 4 iteraciones con 150 arboles 
 imp_ecv <- missForest(xmis = ecv_final_2,ntree = 150,maxiter = 4)
-ecv_final_3 <- imp_ecv$ximp
+ecv_final_3rf <- imp_ecv$ximp
 ecv_sector_t <- ecv_final %>% select(id_individuo,sector_empleo)
-ecv_final_3 <- left_join(x = ecv_final_3,y = ecv_sector_t)
+ecv_final_3rf <- left_join(x = ecv_final_3rf,y = ecv_sector_t)
 
 #---- Resultados de imputación - RF ----
 
 # P8587: Nivel educativo
 P8587_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c3iv_ed_p8587)),4))
 P8587_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
-P8587_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3$c3iv_ed_p8587)),4))
+P8587_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3rf$c3iv_ed_p8587)),4))
 P8587_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
 P8587 <- full_join(x = P8587_ecvorg,y = P8587_ecvimp)
 P8587 %<>% mutate(org = factor(org,levels = c(1,0)))
 
 ## Histograma
-ggplot(data = P8587,mapping = aes(x = cat,y = ecv,fill = org)) + 
+hist_p8587_rf <- ggplot(data = P8587,mapping = aes(x = cat,y = ecv,fill = org)) + 
   geom_bar(stat = "identity",position = "dodge",col="black") + 
   scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
   theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
   labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
        title = "Distribución nivel educativo - ECV",
        subtitle = "Random forest (RF)")
-  
+
 # P1927: Medición evaluativa
 P1927_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_meva_p1927)),4))
 P1927_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
-P1927_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3$c5pi_meva_p1927)),4))
+P1927_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3rf$c5pi_meva_p1927)),4))
 P1927_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
 P1927 <- full_join(x = P1927_ecvorg,y = P1927_ecvimp)
 P1927 %<>% mutate(org = factor(org,levels = c(1,0)))
 
 ## Histograma
-ggplot(data = P1927,mapping = aes(x = cat,y = ecv,fill = org)) + 
+hist_p1927_rf <- ggplot(data = P1927,mapping = aes(x = cat,y = ecv,fill = org)) + 
   geom_bar(stat = "identity",position = "dodge",col="black") + 
   scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
   theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
@@ -370,12 +372,12 @@ ggplot(data = P1927,mapping = aes(x = cat,y = ecv,fill = org)) +
 ## P1901
 P1901_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_mafe_p1901)),4))
 P1901_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
-P1901_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3$c5pi_mafe_p1901)),4))
+P1901_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3rf$c5pi_mafe_p1901)),4))
 P1901_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
 P1901 <- full_join(x = P1901_ecvorg,y = P1901_ecvimp)
 P1901 %<>% mutate(org = factor(org,levels = c(1,0)))
 ### Histograma
-hist_p1901 <- ggplot(data = P1901,mapping = aes(x = cat,y = ecv,fill = org)) + 
+hist_p1901_rf <- ggplot(data = P1901,mapping = aes(x = cat,y = ecv,fill = org)) + 
   geom_bar(stat = "identity",position = "dodge",col="black") + 
   scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
   theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
@@ -386,12 +388,12 @@ hist_p1901 <- ggplot(data = P1901,mapping = aes(x = cat,y = ecv,fill = org)) +
 ## P1903
 P1903_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_mafe_p1903)),4))
 P1903_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
-P1903_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3$c5pi_mafe_p1903)),4))
+P1903_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3rf$c5pi_mafe_p1903)),4))
 P1903_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
 P1903 <- full_join(x = P1903_ecvorg,y = P1903_ecvimp)
 P1903 %<>% mutate(org = factor(org,levels = c(1,0)))
 ### Histograma
-hist_p1903 <- ggplot(data = P1903,mapping = aes(x = cat,y = ecv,fill = org)) + 
+hist_p1903_rf <- ggplot(data = P1903,mapping = aes(x = cat,y = ecv,fill = org)) + 
   geom_bar(stat = "identity",position = "dodge",col="black") + 
   scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
   theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
@@ -402,12 +404,12 @@ hist_p1903 <- ggplot(data = P1903,mapping = aes(x = cat,y = ecv,fill = org)) +
 ## P1904
 P1904_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_mafe_p1904)),4))
 P1904_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
-P1904_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3$c5pi_mafe_p1904)),4))
+P1904_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3rf$c5pi_mafe_p1904)),4))
 P1904_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
 P1904 <- full_join(x = P1904_ecvorg,y = P1904_ecvimp)
 P1904 %<>% mutate(org = factor(org,levels = c(1,0)))
 ### Histograma
-hist_p1904 <- ggplot(data = P1904,mapping = aes(x = cat,y = ecv,fill = org)) + 
+hist_p1904_rf <- ggplot(data = P1904,mapping = aes(x = cat,y = ecv,fill = org)) + 
   geom_bar(stat = "identity",position = "dodge",col="black") + 
   scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
   theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
@@ -415,17 +417,15 @@ hist_p1904 <- ggplot(data = P1904,mapping = aes(x = cat,y = ecv,fill = org)) +
        title = "Distribución medición afectiva (Tristeza) - ECV",
        subtitle = "Random forest (RF)")
 
-ggarrange(hist_p1901,hist_p1903,hist_p1904,ncol = 3,nrow = 1,common.legend = T)
-
 ## P1905
 P1905_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_meud_p1905)),4))
 P1905_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
-P1905_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3$c5pi_meud_p1905)),4))
+P1905_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3rf$c5pi_meud_p1905)),4))
 P1905_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
 P1905 <- full_join(x = P1905_ecvorg,y = P1905_ecvimp)
 P1905 %<>% mutate(org = factor(org,levels = c(1,0)))
 ### Histograma
-ggplot(data = P1905,mapping = aes(x = cat,y = ecv,fill = org)) + 
+hist_p1905_rf <- ggplot(data = P1905,mapping = aes(x = cat,y = ecv,fill = org)) + 
   geom_bar(stat = "identity",position = "dodge",col="black") +
   scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
   theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
@@ -436,12 +436,12 @@ ggplot(data = P1905,mapping = aes(x = cat,y = ecv,fill = org)) +
 ## P1898
 P1898_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c6pm_pins_p1898)),4))
 P1898_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
-P1898_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3$c6pm_pins_p1898)),4))
+P1898_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3rf$c6pm_pins_p1898)),4))
 P1898_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
 P1898 <- full_join(x = P1898_ecvorg,y = P1898_ecvimp)
 P1898 %<>% mutate(org = factor(org,levels = c(1,0)))
 ### Histograma
-ggplot(data = P1898,mapping = aes(x = cat,y = ecv,fill = org)) + 
+hist_p1898_rf <- ggplot(data = P1898,mapping = aes(x = cat,y = ecv,fill = org)) + 
   geom_bar(stat = "identity",position = "dodge",col="black") +
   scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
   theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
@@ -449,9 +449,10 @@ ggplot(data = P1898,mapping = aes(x = cat,y = ecv,fill = org)) +
        title = "Distribución percepción de inseguridad - ECV",
        subtitle = "Random forest (RF)")
 
-# DF's intermedio
-rm(P8587_ecvorg,P8587_ecvimp,P1927_ecvorg,P1927_ecvimp,P1901_ecvorg,P1901_ecvimp,
-   P1903_ecvorg,P1903_ecvimp,P1904_ecvorg,P1904_ecvimp,P1905_ecvorg,P1905_ecvimp)
+lista_hist_rf <- list(hist_p8587_rf,hist_p1927_rf,hist_p1901_rf,hist_p1903_rf,hist_p1904_rf,
+                      hist_p1905_rf,hist_p1898_rf)
+
+ggarrange(plotlist = lista_hist_rf,common.legend = T)
 
 #---- Pruebas de imputación - MiceRanger ----
 
@@ -462,22 +463,143 @@ imp_mr <- miceRanger(data = ecv_final_2,m = 3,maxiter = 6,
                      vars = vars_imp,min.node.size = 10,
                      num.trees = 300,valueSelector = "meanMatch")
 
-ecv_final_3 <- completeData(imp_mr, datasets = 3)[[1]]
+ecv_final_3mr <- completeData(imp_mr, datasets = 3)[[1]]
 ecv_secemp <- ecv_final %>% select(id_individuo,sector_empleo)
-ecv_final_3 <- left_join(x = ecv_final_3,y = ecv_secemp)
+ecv_final_3mr <- left_join(x = ecv_final_3mr,y = ecv_secemp)
 rm(ecv_secemp)
 
 #---- Resultados de imputación - MiceRanger ----
-#---- Creación de componentes ----
+
+# P8587: Nivel educativo
+P8587_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c3iv_ed_p8587)),4))
+P8587_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
+P8587_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3mr$c3iv_ed_p8587)),4))
+P8587_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
+P8587 <- full_join(x = P8587_ecvorg,y = P8587_ecvimp)
+P8587 %<>% mutate(org = factor(org,levels = c(1,0)))
+
+## Histograma
+hist_p8587_mr <- ggplot(data = P8587,mapping = aes(x = cat,y = ecv,fill = org)) + 
+  geom_bar(stat = "identity",position = "dodge",col="black") + 
+  scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
+  theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
+  labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
+       title = "Distribución nivel educativo - ECV",
+       subtitle = "MICE + Random forest (RF)")
+
+# P1927: Medición evaluativa
+P1927_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_meva_p1927)),4))
+P1927_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
+P1927_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3mr$c5pi_meva_p1927)),4))
+P1927_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
+P1927 <- full_join(x = P1927_ecvorg,y = P1927_ecvimp)
+P1927 %<>% mutate(org = factor(org,levels = c(1,0)))
+
+## Histograma
+hist_p1927_mr <- ggplot(data = P1927,mapping = aes(x = cat,y = ecv,fill = org)) + 
+  geom_bar(stat = "identity",position = "dodge",col="black") + 
+  scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
+  theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
+  labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
+       title = "Distribución medición evaluativa - ECV",
+       subtitle = "MICE + Random forest (RF)")
+
+# P1901,P1903 & P1904 - Medición afectiva
+## P1901
+P1901_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_mafe_p1901)),4))
+P1901_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
+P1901_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3mr$c5pi_mafe_p1901)),4))
+P1901_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
+P1901 <- full_join(x = P1901_ecvorg,y = P1901_ecvimp)
+P1901 %<>% mutate(org = factor(org,levels = c(1,0)))
+### Histograma
+hist_p1901_mr <- ggplot(data = P1901,mapping = aes(x = cat,y = ecv,fill = org)) + 
+  geom_bar(stat = "identity",position = "dodge",col="black") + 
+  scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
+  theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
+  labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
+       title = "Distribución medición afectiva (Felicidad) - ECV",
+       subtitle = "MICE + Random forest (RF)")
+
+## P1903
+P1903_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_mafe_p1903)),4))
+P1903_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
+P1903_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3mr$c5pi_mafe_p1903)),4))
+P1903_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
+P1903 <- full_join(x = P1903_ecvorg,y = P1903_ecvimp)
+P1903 %<>% mutate(org = factor(org,levels = c(1,0)))
+### Histograma
+hist_p1903_mr <- ggplot(data = P1903,mapping = aes(x = cat,y = ecv,fill = org)) + 
+  geom_bar(stat = "identity",position = "dodge",col="black") + 
+  scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
+  theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
+  labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
+       title = "Distribución medición afectiva (Preocupación) - ECV",
+       subtitle = "MICE + Random forest (RF)")
+
+## P1904
+P1904_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_mafe_p1904)),4))
+P1904_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
+P1904_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3mr$c5pi_mafe_p1904)),4))
+P1904_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
+P1904 <- full_join(x = P1904_ecvorg,y = P1904_ecvimp)
+P1904 %<>% mutate(org = factor(org,levels = c(1,0)))
+### Histograma
+hist_p1904_mr <- ggplot(data = P1904,mapping = aes(x = cat,y = ecv,fill = org)) + 
+  geom_bar(stat = "identity",position = "dodge",col="black") + 
+  scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
+  theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
+  labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
+       title = "Distribución medición afectiva (Tristeza) - ECV",
+       subtitle = "MICE + Random forest (RF)")
+
+## P1905
+P1905_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_meud_p1905)),4))
+P1905_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
+P1905_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3mr$c5pi_meud_p1905)),4))
+P1905_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
+P1905 <- full_join(x = P1905_ecvorg,y = P1905_ecvimp)
+P1905 %<>% mutate(org = factor(org,levels = c(1,0)))
+### Histograma
+hist_p1905_mr <- ggplot(data = P1905,mapping = aes(x = cat,y = ecv,fill = org)) + 
+  geom_bar(stat = "identity",position = "dodge",col="black") +
+  scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
+  theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
+  labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
+       title = "Distribución medición eudaimónica - ECV",
+       subtitle = "MICE + Random forest (RF)")
+
+## P1898
+P1898_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c6pm_pins_p1898)),4))
+P1898_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
+P1898_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3mr$c6pm_pins_p1898)),4))
+P1898_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
+P1898 <- full_join(x = P1898_ecvorg,y = P1898_ecvimp)
+P1898 %<>% mutate(org = factor(org,levels = c(1,0)))
+### Histograma
+hist_p1898_mr <- ggplot(data = P1898,mapping = aes(x = cat,y = ecv,fill = org)) + 
+  geom_bar(stat = "identity",position = "dodge",col="black") +
+  scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
+  theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
+  labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
+       title = "Distribución percepción de inseguridad - ECV",
+       subtitle = "MICE + Random forest (RF)")
+
+lista_hist_mr <- list(hist_p8587_mr,hist_p1927_mr,hist_p1901_mr,hist_p1903_mr,hist_p1904_mr,
+                      hist_p1905_mr,hist_p1898_mr)
+
+ggarrange(plotlist = lista_hist_mr,common.legend = T)
+
+#---- Creación de componentes - Sin imputación ----
 
 # Datos faltantes
-ecv_na <- miss_var_summary(data = ecv_final_3)
+ecv_na <- miss_var_summary(data = ecv_final)
 names(ecv_na) <- c("Variable","N","%N")
 datasummary_df(data = ecv_na,align = "lcc",fmt = 1,
                title = "Datos faltantes - ECV")
 
 # Componente 1: Calidad interna de la vivienda
-ecv_c1 <- ecv_final_3 %>% select(id_individuo,starts_with("c1"))
+ecv_c1 <- ecv_final %>% select(id_individuo,starts_with("c1"))
 ecv_c1a <- ecv_c1
 str(ecv_c1)
 rownames(ecv_c1) <- ecv_c1$id_individuo
@@ -487,7 +609,7 @@ datasummary_skim(data = ecv_c1,align = "lccc",
                  title = "Componente 1: Calidad interna de la vivienda")
 
 # Componente 2: Calidad del entorno
-ecv_c2 <- ecv_final_3 %>% select(id_individuo,starts_with("c2"))
+ecv_c2 <- ecv_final %>% select(id_individuo,starts_with("c2"))
 ecv_c2a <- ecv_c2
 str(ecv_c2)
 rownames(ecv_c2) <- ecv_c2$id_individuo
@@ -497,7 +619,7 @@ datasummary_skim(data = ecv_c2,align = "lccc",
                  title = "Componente 2: Calidad del entorno")
 
 # Componente 3: Ingresos y estilo de vida
-ecv_c3 <- ecv_final_3 %>% select(id_individuo,starts_with("c3"))
+ecv_c3 <- ecv_final %>% select(id_individuo,starts_with("c3"))
 ecv_c3a <- ecv_c3
 str(ecv_c3)
 rownames(ecv_c3) <- ecv_c3$id_individuo
@@ -509,7 +631,7 @@ ecv_c3 %<>% select(-id_individuo) %>%
 datasummary_skim(data = ecv_c3)
 
 # Componente 4: Características del hogar
-ecv_c4 <- ecv_final_3 %>% select(id_individuo,starts_with("c4"))
+ecv_c4 <- ecv_final %>% select(id_individuo,starts_with("c4"))
 ecv_c4a <- ecv_c4
 str(ecv_c4)
 rownames(ecv_c4) <- ecv_c4$id_individuo
@@ -522,7 +644,7 @@ datasummary_skim(data = ecv_c4)
 ecv_c4p1 <- ecv_c4 %>% select(-c4ch_age_p6040)
 
 # Componente 5: Percepción individual
-ecv_c5 <- ecv_final_3 %>% select(id_individuo,starts_with("c5"))
+ecv_c5 <- ecv_final %>% select(id_individuo,starts_with("c5"))
 ecv_c5a <- ecv_c5
 str(ecv_c5)
 rownames(ecv_c5) <- ecv_c5$id_individuo 
@@ -530,7 +652,145 @@ ecv_c5 %<>% select(-id_individuo) %>% mutate(across(where(is.numeric), factor))
 datasummary_skim(data = ecv_c5,title = "Componente 5: Percepción sentimental")
 
 # Componente 6: Percepción material
-ecv_c6 <- ecv_final_3 %>% select(id_individuo,starts_with("c6"))
+ecv_c6 <- ecv_final %>% select(id_individuo,starts_with("c6"))
+ecv_c6a <- ecv_c6
+str(ecv_c6)
+rownames(ecv_c6) <- ecv_c6$id_individuo 
+ecv_c6 %<>% select(-id_individuo) %>% mutate(across(where(is.numeric), factor))
+datasummary_skim(data = ecv_c6,title = "Componente 6: Percepción material")
+
+#---- Creación de componentes - RF ----
+
+# Datos faltantes
+ecv_na <- miss_var_summary(data = ecv_final_3rf)
+names(ecv_na) <- c("Variable","N","%N")
+datasummary_df(data = ecv_na,align = "lcc",fmt = 1,
+               title = "Datos faltantes - ECV")
+
+# Componente 1: Calidad interna de la vivienda
+ecv_c1 <- ecv_final_3rf %>% select(id_individuo,starts_with("c1"))
+ecv_c1a <- ecv_c1
+str(ecv_c1)
+rownames(ecv_c1) <- ecv_c1$id_individuo
+ecv_c1 %<>% select(-id_individuo)
+ecv_c1 %<>% mutate(across(where(is.numeric), factor))
+datasummary_skim(data = ecv_c1,align = "lccc",
+                 title = "Componente 1: Calidad interna de la vivienda")
+
+# Componente 2: Calidad del entorno
+ecv_c2 <- ecv_final_3rf %>% select(id_individuo,starts_with("c2"))
+ecv_c2a <- ecv_c2
+str(ecv_c2)
+rownames(ecv_c2) <- ecv_c2$id_individuo
+ecv_c2 %<>% select(-id_individuo)
+ecv_c2 %<>% mutate(across(where(is.numeric), factor))
+datasummary_skim(data = ecv_c2,align = "lccc",
+                 title = "Componente 2: Calidad del entorno")
+
+# Componente 3: Ingresos y estilo de vida
+ecv_c3 <- ecv_final_3rf %>% select(id_individuo,starts_with("c3"))
+ecv_c3a <- ecv_c3
+str(ecv_c3)
+rownames(ecv_c3) <- ecv_c3$id_individuo
+ecv_c3 %<>% select(-id_individuo) %>% 
+  mutate(c3iv_hac_perhog = as.numeric(c3iv_hac_perhog),
+         c3iv_hac_p5000 = as.numeric(c3iv_hac_p5000),
+         c3iv_hac_p5010 = as.numeric(c3iv_hac_p5010),
+         c3iv_ed_p8587 = factor(x = c3iv_ed_p8587,levels = 1:13))
+datasummary_skim(data = ecv_c3)
+
+# Componente 4: Características del hogar
+ecv_c4 <- ecv_final_3rf %>% select(id_individuo,starts_with("c4"))
+ecv_c4a <- ecv_c4
+str(ecv_c4)
+rownames(ecv_c4) <- ecv_c4$id_individuo
+ecv_c4 %<>% select(-id_individuo) %>% 
+  mutate(c4ch_sn_p6020 = as.factor(c4ch_sn_p6020),
+         c4ch_pjh_p6051 = as.factor(c4ch_pjh_p6051),
+         c4ch_age_gen = as.factor(c4ch_age_gen),
+         c4ch_sjh = as.factor(c4ch_sjh))
+datasummary_skim(data = ecv_c4)
+ecv_c4p1 <- ecv_c4 %>% select(-c4ch_age_p6040)
+
+# Componente 5: Percepción individual
+ecv_c5 <- ecv_final_3rf %>% select(id_individuo,starts_with("c5"))
+ecv_c5a <- ecv_c5
+str(ecv_c5)
+rownames(ecv_c5) <- ecv_c5$id_individuo 
+ecv_c5 %<>% select(-id_individuo) %>% mutate(across(where(is.numeric), factor))
+datasummary_skim(data = ecv_c5,title = "Componente 5: Percepción sentimental")
+
+# Componente 6: Percepción material
+ecv_c6 <- ecv_final_3rf %>% select(id_individuo,starts_with("c6"))
+ecv_c6a <- ecv_c6
+str(ecv_c6)
+rownames(ecv_c6) <- ecv_c6$id_individuo 
+ecv_c6 %<>% select(-id_individuo) %>% mutate(across(where(is.numeric), factor))
+datasummary_skim(data = ecv_c6,title = "Componente 6: Percepción material")
+
+#---- Creación de componentes - MiceRanger ----
+
+# Datos faltantes
+ecv_na <- miss_var_summary(data = ecv_final_3mr)
+names(ecv_na) <- c("Variable","N","%N")
+datasummary_df(data = ecv_na,align = "lcc",fmt = 1,
+               title = "Datos faltantes - ECV")
+
+# Componente 1: Calidad interna de la vivienda
+ecv_c1 <- ecv_final_3mr %>% select(id_individuo,starts_with("c1"))
+ecv_c1a <- ecv_c1
+str(ecv_c1)
+rownames(ecv_c1) <- ecv_c1$id_individuo
+ecv_c1 %<>% select(-id_individuo)
+ecv_c1 %<>% mutate(across(where(is.numeric), factor))
+datasummary_skim(data = ecv_c1,align = "lccc",
+                 title = "Componente 1: Calidad interna de la vivienda")
+
+# Componente 2: Calidad del entorno
+ecv_c2 <- ecv_final_3mr %>% select(id_individuo,starts_with("c2"))
+ecv_c2a <- ecv_c2
+str(ecv_c2)
+rownames(ecv_c2) <- ecv_c2$id_individuo
+ecv_c2 %<>% select(-id_individuo)
+ecv_c2 %<>% mutate(across(where(is.numeric), factor))
+datasummary_skim(data = ecv_c2,align = "lccc",
+                 title = "Componente 2: Calidad del entorno")
+
+# Componente 3: Ingresos y estilo de vida
+ecv_c3 <- ecv_final_3mr %>% select(id_individuo,starts_with("c3"))
+ecv_c3a <- ecv_c3
+str(ecv_c3)
+rownames(ecv_c3) <- ecv_c3$id_individuo
+ecv_c3 %<>% select(-id_individuo) %>% 
+  mutate(c3iv_hac_perhog = as.numeric(c3iv_hac_perhog),
+         c3iv_hac_p5000 = as.numeric(c3iv_hac_p5000),
+         c3iv_hac_p5010 = as.numeric(c3iv_hac_p5010),
+         c3iv_ed_p8587 = factor(x = c3iv_ed_p8587,levels = 1:13))
+datasummary_skim(data = ecv_c3)
+
+# Componente 4: Características del hogar
+ecv_c4 <- ecv_final_3mr %>% select(id_individuo,starts_with("c4"))
+ecv_c4a <- ecv_c4
+str(ecv_c4)
+rownames(ecv_c4) <- ecv_c4$id_individuo
+ecv_c4 %<>% select(-id_individuo) %>% 
+  mutate(c4ch_sn_p6020 = as.factor(c4ch_sn_p6020),
+         c4ch_pjh_p6051 = as.factor(c4ch_pjh_p6051),
+         c4ch_age_gen = as.factor(c4ch_age_gen),
+         c4ch_sjh = as.factor(c4ch_sjh))
+datasummary_skim(data = ecv_c4)
+ecv_c4p1 <- ecv_c4 %>% select(-c4ch_age_p6040)
+
+# Componente 5: Percepción individual
+ecv_c5 <- ecv_final_3mr %>% select(id_individuo,starts_with("c5"))
+ecv_c5a <- ecv_c5
+str(ecv_c5)
+rownames(ecv_c5) <- ecv_c5$id_individuo 
+ecv_c5 %<>% select(-id_individuo) %>% mutate(across(where(is.numeric), factor))
+datasummary_skim(data = ecv_c5,title = "Componente 5: Percepción sentimental")
+
+# Componente 6: Percepción material
+ecv_c6 <- ecv_final_3mr %>% select(id_individuo,starts_with("c6"))
 ecv_c6a <- ecv_c6
 str(ecv_c6)
 rownames(ecv_c6) <- ecv_c6$id_individuo 
@@ -624,7 +884,8 @@ rcatpca_c6 %<>% mutate(id_individuo = rownames(rcatpca_c6))
 rownames(rcatpca_c6) <- 1:nrow(rcatpca_c6)
 ecv_c6a <- left_join(x = rcatpca_c6,y = ecv_c6a)
 
-# Adición de componentes a ECV
+#---- Adición de componentes a ECV ----
+
 ecv_final <- left_join(x = ecv_final,y = ecv_c1a)
 ecv_final <- left_join(x = ecv_final,y = ecv_c2a)
 ecv_final <- left_join(x = ecv_final,y = ecv_c3a)
@@ -643,12 +904,12 @@ rm(ecv_c1,ecv_c2,ecv_c3,ecv_c4,ecv_c5,ecv_c6,
 ecv_final %<>% relocate(directorio,secuencia_p,orden,id_hogar,id_individuo,
                         segmento,estrato2020,fex_c,p1_departamento,p1_municipio,
                         mpio,sector_empleo,contains("c1"),contains("c2"),
-                        contains("c3"),contains("c4"),contains("c5"))
+                        contains("c3"),contains("c4"),contains("c5"),contains("c6"))
 
 # Selección de componentes parciales
-ecv_final_pca <- ecv_final %>% select(id_individuo,contains("catpca"),-catpca_c6)
+ecv_final_pca <- ecv_final %>% select(id_individuo,contains("catpca"))
 rownames(ecv_final_pca) <- ecv_final_pca$id_individuo
-ecv_final_pca %>% select(-id_individuo)
+ecv_final_pca %<>% select(-id_individuo)
 
 # Estimación de PCA - Componentes parciales
 pca_iib <- prcomp(x = ecv_final_pca,center = T,scale.=T)
