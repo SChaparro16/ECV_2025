@@ -338,54 +338,120 @@ P8587_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
 P8587_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3$c3iv_ed_p8587)),4))
 P8587_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
 P8587 <- full_join(x = P8587_ecvorg,y = P8587_ecvimp)
-## Gráfico QQ
-par(mfrow = c(1,2))
-qqnorm(ecv_final$c3iv_ed_p8587,main = "Datos originales")
-qqnorm(as.numeric(ecv_final_3$c3iv_ed_p8587),main = "Datos imputados")
-## Histogramas
-### Datos originales
-hist_dorg <- ggplot(data = P8587_ecvorg,mapping = aes(x = cat,y = ecv)) +
-  geom_bar(stat = "identity",fill = "steelblue") + theme_classic() + 
-  labs(title = "Distribución del nivel educativo",subtitle = "Datos originales",
-       x = "Categoría",y = "Porcentaje") + 
-  scale_y_continuous(labels = scales::percent,limits = c(0,0.35),n.breaks = 10)
-### Datos Imputados
-hist_dimp <- ggplot(data = P8587_ecvimp,mapping = aes(x = cat,y = ecv)) +
-  geom_bar(stat = "identity",fill = "steelblue") + theme_classic() + 
-  labs(title = "Distribución del nivel educativo",subtitle = "Datos imputados",
-       x = "Categoría",y = "Porcentaje") + 
-  scale_y_continuous(labels = scales::percent,limits = c(0,0.5),n.breaks = 10)
-### Resultado
-ggarrange(hist_dorg,hist_dimp,ncol = 1,nrow = 2)
+P8587 %<>% mutate(org = factor(org,levels = c(1,0)))
 
-# P1927: Nivel educativo
+## Histograma
+ggplot(data = P8587,mapping = aes(x = cat,y = ecv,fill = org)) + 
+  geom_bar(stat = "identity",position = "dodge",col="black") + 
+  scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
+  theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
+  labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
+       title = "Distribución nivel educativo - ECV",
+       subtitle = "Random forest (RF)")
+  
+# P1927: Medición evaluativa
 P1927_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_meva_p1927)),4))
 P1927_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
 P1927_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3$c5pi_meva_p1927)),4))
 P1927_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
 P1927 <- full_join(x = P1927_ecvorg,y = P1927_ecvimp)
-## Gráfico QQ
-par(mfrow = c(1,2))
-qqnorm(ecv_final$c5pi_meva_p1927,main = "Datos originales")
-qqnorm(as.numeric(ecv_final_3$c5pi_meva_p1927),main = "Datos imputados")
-## Histogramas
-### Datos originales
-hist_dorg_2 <- ggplot(data = P1927_ecvorg,mapping = aes(x = cat,y = ecv)) +
-  geom_bar(stat = "identity",fill = "steelblue") + theme_classic() + 
-  labs(title = "Distribución medición evaluativa",subtitle = "Datos originales",
-       x = "Categoría",y = "Porcentaje") + 
-  scale_y_continuous(labels = scales::percent,limits = c(0,0.35),n.breaks = 10)
-### Datos Imputados
-hist_dimp_2 <- ggplot(data = P1927_ecvimp,mapping = aes(x = cat,y = ecv)) +
-  geom_bar(stat = "identity",fill = "steelblue") + theme_classic() + 
-  labs(title = "Distribución medición Evaluativa",subtitle = "Datos imputados",
-       x = "Categoría",y = "Porcentaje") + 
-  scale_y_continuous(labels = scales::percent,limits = c(0,0.5),n.breaks = 10)
-### Resultado
-ggarrange(hist_dorg_2,hist_dimp_2,ncol = 1,nrow = 2)
+P1927 %<>% mutate(org = factor(org,levels = c(1,0)))
+
+## Histograma
+ggplot(data = P1927,mapping = aes(x = cat,y = ecv,fill = org)) + 
+  geom_bar(stat = "identity",position = "dodge",col="black") + 
+  scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
+  theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
+  labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
+       title = "Distribución medición evaluativa - ECV",
+       subtitle = "Random forest (RF)")
+
+# P1901,P1903 & P1904 - Medición afectiva
+## P1901
+P1901_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_mafe_p1901)),4))
+P1901_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
+P1901_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3$c5pi_mafe_p1901)),4))
+P1901_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
+P1901 <- full_join(x = P1901_ecvorg,y = P1901_ecvimp)
+P1901 %<>% mutate(org = factor(org,levels = c(1,0)))
+### Histograma
+hist_p1901 <- ggplot(data = P1901,mapping = aes(x = cat,y = ecv,fill = org)) + 
+  geom_bar(stat = "identity",position = "dodge",col="black") + 
+  scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
+  theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
+  labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
+       title = "Distribución medición afectiva (Felicidad) - ECV",
+       subtitle = "Random forest (RF)")
+
+## P1903
+P1903_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_mafe_p1903)),4))
+P1903_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
+P1903_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3$c5pi_mafe_p1903)),4))
+P1903_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
+P1903 <- full_join(x = P1903_ecvorg,y = P1903_ecvimp)
+P1903 %<>% mutate(org = factor(org,levels = c(1,0)))
+### Histograma
+hist_p1903 <- ggplot(data = P1903,mapping = aes(x = cat,y = ecv,fill = org)) + 
+  geom_bar(stat = "identity",position = "dodge",col="black") + 
+  scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
+  theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
+  labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
+       title = "Distribución medición afectiva (Preocupación) - ECV",
+       subtitle = "Random forest (RF)")
+
+## P1904
+P1904_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_mafe_p1904)),4))
+P1904_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
+P1904_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3$c5pi_mafe_p1904)),4))
+P1904_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
+P1904 <- full_join(x = P1904_ecvorg,y = P1904_ecvimp)
+P1904 %<>% mutate(org = factor(org,levels = c(1,0)))
+### Histograma
+hist_p1904 <- ggplot(data = P1904,mapping = aes(x = cat,y = ecv,fill = org)) + 
+  geom_bar(stat = "identity",position = "dodge",col="black") + 
+  scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
+  theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
+  labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
+       title = "Distribución medición afectiva (Tristeza) - ECV",
+       subtitle = "Random forest (RF)")
+
+ggarrange(hist_p1901,hist_p1903,hist_p1904,ncol = 3,nrow = 1,common.legend = T)
+
+## P1905
+P1905_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c5pi_meud_p1905)),4))
+P1905_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
+P1905_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3$c5pi_meud_p1905)),4))
+P1905_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
+P1905 <- full_join(x = P1905_ecvorg,y = P1905_ecvimp)
+P1905 %<>% mutate(org = factor(org,levels = c(1,0)))
+### Histograma
+ggplot(data = P1905,mapping = aes(x = cat,y = ecv,fill = org)) + 
+  geom_bar(stat = "identity",position = "dodge",col="black") +
+  scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
+  theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
+  labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
+       title = "Distribución medición eudaimónica - ECV",
+       subtitle = "Random forest (RF)")
+
+## P1898
+P1898_ecvorg <- as.data.frame(round(prop.table(x = table(ecv_final$c6pm_pins_p1898)),4))
+P1898_ecvorg %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 1)
+P1898_ecvimp <- as.data.frame(round(prop.table(x = table(ecv_final_3$c6pm_pins_p1898)),4))
+P1898_ecvimp %<>% rename("cat" = Var1,"ecv" = Freq) %>% mutate(org = 0)
+P1898 <- full_join(x = P1898_ecvorg,y = P1898_ecvimp)
+P1898 %<>% mutate(org = factor(org,levels = c(1,0)))
+### Histograma
+ggplot(data = P1898,mapping = aes(x = cat,y = ecv,fill = org)) + 
+  geom_bar(stat = "identity",position = "dodge",col="black") +
+  scale_fill_manual(values = c("0" = "darkblue","1" = "gold"),labels = c("Original","Imputado")) + 
+  theme_classic() + scale_y_continuous(labels = scales::percent,n.breaks = 10) + 
+  labs(fill = "Tipo de dato",x = "Categoría",y = "Porcentaje",
+       title = "Distribución percepción de inseguridad - ECV",
+       subtitle = "Random forest (RF)")
 
 # DF's intermedio
-rm(P8587_ecvorg,P8587_ecvimp,P1927_ecvorg,P1927_ecvimp)
+rm(P8587_ecvorg,P8587_ecvimp,P1927_ecvorg,P1927_ecvimp,P1901_ecvorg,P1901_ecvimp,
+   P1903_ecvorg,P1903_ecvimp,P1904_ecvorg,P1904_ecvimp,P1905_ecvorg,P1905_ecvimp)
 
 #---- Pruebas de imputación - MiceRanger ----
 
@@ -401,6 +467,7 @@ ecv_secemp <- ecv_final %>% select(id_individuo,sector_empleo)
 ecv_final_3 <- left_join(x = ecv_final_3,y = ecv_secemp)
 rm(ecv_secemp)
 
+#---- Resultados de imputación - MiceRanger ----
 #---- Creación de componentes ----
 
 # Datos faltantes
