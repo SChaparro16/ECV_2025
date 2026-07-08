@@ -4,6 +4,8 @@
 library(readr)
 # Diseño de encuesta
 library(srvyr)
+# PCA
+library(factoextra)
 # Edición de datos
 library(dplyr)
 library(naniar)
@@ -43,6 +45,9 @@ for (i in dirs) {
 rm(dir_datos,dir_val,dirs,i)
 
 #---- Datos ----
+
+# Semilla
+set.seed(20260101)
 
 # Variables
 vars <- read.csv("vars.csv")
@@ -911,9 +916,28 @@ ecv_final_pca <- ecv_final %>% select(id_individuo,contains("catpca"))
 rownames(ecv_final_pca) <- ecv_final_pca$id_individuo
 ecv_final_pca %<>% select(-id_individuo)
 
-# Estimación de PCA - Componentes parciales
+# Estimación de PCA
 pca_iib <- prcomp(x = ecv_final_pca,center = T,scale.=T)
 summary(pca_iib)
+
+# Gráfico de sedimentación 
+fviz_eig(pca_iib,addlabels = TRUE,ylim = c(0, 50),barfill = "steelblue",
+         barcolor = "steelblue",main = "Gráfico de sedimentación",
+         xlab = "Componentes Principales",ylab = "Varianza Explicada (%)")
+
+# Circulo de correlación
+
+fviz_pca_var(pca_iib,col.var = "contrib",
+             gradient.cols = c("darkgreen","gold","sienna2","red"),
+             repel = TRUE,
+             title = "Círculo de Correlación")
+
+# Gráfico de individuos
+
+fviz_pca_ind(pca_iib,col.ind = "cos2",
+             gradient.cols = c("darkgreen","gold","sienna2","red"),
+             geom = "point",alpha.ind = 0.3,title = "Mapa de Individuos",
+             xlab = "PC1",ylab = "PC2")
 
 #---- Diseño de encuesta ----
 
